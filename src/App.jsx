@@ -102,8 +102,10 @@ function App() {
     const playerId = player.person.id;
     const playerImg = getPlayerImageUrl(player.person.id, 100);
     const playerName = player.person.fullName;
-    const playerStats = player.stats.batting.summary;
-    return <PlayerCard key={playerId} playerId={playerId} playerImg={playerImg} playerName={playerName} playerStats={playerStats}/>;
+    const playerPosition = player.position.name;
+    const playerBattingSummary = player.stats.batting.summary;
+    const playerPitchingSummary = player.stats.pitching.summary;
+    return <PlayerCard key={playerId} playerId={playerId} playerImg={playerImg} playerName={playerName} playerPosition={playerPosition} playerBattingSummary={playerBattingSummary} playerPitchingSummary={playerPitchingSummary}/>;
   });
 
   return (

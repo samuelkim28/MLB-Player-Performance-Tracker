@@ -5,6 +5,14 @@ function getPlayerProfileUrl(playerId, playerName) {
     return playerProfileUrl;
 }
 
+function isPitcher(playerPosition) {
+    if (playerPosition === "Pitcher") {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 function PlayerCard(props) {
     let playerProfileUrl = getPlayerProfileUrl(props.playerId, props.playerName);
 
@@ -14,7 +22,7 @@ function PlayerCard(props) {
                 <a href={playerProfileUrl}>
                     <img src={props.playerImg}/>
                 </a>
-                <p>{props.playerName} {props.playerStats}</p>
+                <p>{props.playerName} {isPitcher(props.playerPosition)? props.playerPitchingSummary : props.playerBattingSummary}</p>
             </article>
         </>
     );
