@@ -112,7 +112,7 @@ function App() {
     <>
       <h1>MLB Performance Tracker</h1>
       <TeamSelector handleTeamSelect={handleTeamSelect}/>
-      <DateSelector handleDateSelect={handleDateSelect}/>
+      <DateSelector handleDateSelect={handleDateSelect} todaysDate={getTodaysDate()}/>
       {currPlayerElements}
     </>
   );
