@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import './App.css'
+import './styles/App.css'
 import PlayerCard from './components/PlayerCard';
 import TeamSelector from './components/TeamSelector';
+import DateSelector from './components/DateSelector';
 
 function getPlayers(jsonData, team) {
   const players = [];
@@ -41,8 +42,8 @@ function getBoxScoreOfGameUrl(gameId) {
   return `https://statsapi.mlb.com/api/v1/game/${gameId}/boxscore`;
 }
 
-function getTodaysScheduleUrl() {
-  return `https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${getTodaysDate()}`;
+function getScheduleUrl(date) {
+  return `https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${date}`;
 }
 
 // Note: a team could play twice in one day
@@ -73,14 +74,21 @@ function getTodaysDate() {
 function App() {
   const [currPlayers, setCurrPlayers] = useState([])
   const [currTeam, setCurrTeam] = useState("Boston Red Sox");
+  const [currDate, setCurrDate] = useState(getTodaysDate());
 
-  function handleSelectChange(value) {
+  function handleTeamSelect(value) {
     setCurrTeam(value);
+  }
+
+  function handleDateSelect(value) {
+    console.log(value);
+    setCurrDate(value);
   }
 
   useEffect(() => {
     let team = currTeam;
-    fetch(getTodaysScheduleUrl())
+    let date = currDate;
+    fetch(getScheduleUrl(date))
       .then(response => response.json())
       .then(result => {
         let gameId = getGameId(result, team);
@@ -88,7 +96,7 @@ function App() {
           .then(resp => resp.json())
           .then(res => setCurrPlayers(getPlayers(res, team)));
       })
-  }, [currTeam]);
+  }, [currTeam, currDate]);
 
   const currPlayerElements = currPlayers.map(player => {
     const playerId = player.person.id;
@@ -101,7 +109,8 @@ function App() {
   return (
     <>
       <h1>MLB Performance Tracker</h1>
-      <TeamSelector handleSelectChange={handleSelectChange}/>
+      <TeamSelector handleTeamSelect={handleTeamSelect}/>
+      <DateSelector handleDateSelect={handleDateSelect}/>
       {currPlayerElements}
     </>
   );

@@ -1,8 +1,8 @@
-function TeamSelector({ handleSelectChange }) {
+function TeamSelector({ handleTeamSelect }) {
     return (
         <>
             <label htmlFor="team-select"></label> <br />
-            <select name="teams" id="team-select" onChange={e => handleSelectChange(e.target.value)}>
+            <select name="teams" id="team-select" onChange={e => handleTeamSelect(e.target.value)}>
                 <hr />
                 <optgroup label="AL East">
                     <option value="Baltimore Orioles">Baltimore Orioles</option>
