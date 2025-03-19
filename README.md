@@ -1,12 +1,5 @@
-# React + Vite
+# MLB Player Performance Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This web application is for MLB fans interested in keeping up with MLB player performances and stats. It uses the official MLB stats API to display real-time data about MLB players' stats. It is currently a work in progress and I plan to design an algorithm that ranks players based on their baseball statistics on the day. 
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+![App Screenshot](src/assets/web-app-screenshot.png)
