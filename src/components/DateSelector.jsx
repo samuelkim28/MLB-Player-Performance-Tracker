@@ -1,6 +1,6 @@
-function DateSelector({ handleDateSelect, todaysDate }) {
+function DateSelector({ handleDateSelect, currDate }) {
     return (
-        <input type="date" value={todaysDate} onChange={e => handleDateSelect(e.target.value)}/>
+        <input type="date" value={currDate} onChange={e => handleDateSelect(e.target.value)}/>
     );
 }
 

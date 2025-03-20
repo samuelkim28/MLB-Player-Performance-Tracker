@@ -1,7 +1,7 @@
 function TeamSelector({ handleTeamSelect }) {
     return (
         <>
-            <label htmlFor="team-select"></label> <br />
+            <label htmlFor="team-select"></label>
             <select name="teams" id="team-select" onChange={e => handleTeamSelect(e.target.value)}>
                 <hr />
                 <optgroup label="AL East">

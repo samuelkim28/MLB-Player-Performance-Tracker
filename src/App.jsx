@@ -94,8 +94,10 @@ function App() {
         let gameId = getGameId(result, team);
         fetch(getBoxScoreOfGameUrl(gameId))
           .then(resp => resp.json())
-          .then(res => setCurrPlayers(getPlayers(res, team)));
-      })
+          .then(res => {
+            setCurrPlayers(getPlayers(res, team));
+          });
+      });
   }, [currTeam, currDate]);
 
   const currPlayerElements = currPlayers.map(player => {
@@ -111,9 +113,12 @@ function App() {
   return (
     <>
       <h1>MLB Performance Tracker</h1>
-      <TeamSelector handleTeamSelect={handleTeamSelect}/>
-      <DateSelector handleDateSelect={handleDateSelect} todaysDate={getTodaysDate()}/>
+      <div className="input-container">
+        <TeamSelector handleTeamSelect={handleTeamSelect}/>
+        <DateSelector handleDateSelect={handleDateSelect} currDate={currDate}/>        
+      </div>
       {currPlayerElements}
+      {/* {currPlayers.length === 0? <p>The {currTeam} did not play on {currDate}. Please select another team/date.</p> : null} */}
     </>
   );
 }

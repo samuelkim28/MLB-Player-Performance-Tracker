@@ -1,3 +1,5 @@
+import '../styles/App.css'
+
 function getPlayerProfileUrl(playerId, playerName) {
     let temp = playerName.toLowerCase();
     temp = temp.replaceAll(" ", "-");
@@ -20,9 +22,9 @@ function PlayerCard(props) {
         <>
             <article className="player-card">
                 <a href={playerProfileUrl}>
-                    <img src={props.playerImg}/>
+                    <img src={props.playerImg} className="player-image"/>
                 </a>
-                <p>{props.playerName} {isPitcher(props.playerPosition)? props.playerPitchingSummary : props.playerBattingSummary}</p>
+                <p className="player-summary">{props.playerName} {isPitcher(props.playerPosition)? props.playerPitchingSummary : props.playerBattingSummary}</p>
             </article>
         </>
     );
