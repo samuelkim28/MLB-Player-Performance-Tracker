@@ -1,12 +1,12 @@
-function TeamSelector({ handleTeamSelect }) {
+function TeamSelector({ handleTeamSelect, currTeam }) {
     return (
         <>
             <label htmlFor="team-select"></label>
-            <select name="teams" id="team-select" onChange={e => handleTeamSelect(e.target.value)}>
+            <select value={currTeam} name="teams" id="team-select" onChange={e => handleTeamSelect(e.target.value)}>
                 <hr />
                 <optgroup label="AL East">
                     <option value="Baltimore Orioles">Baltimore Orioles</option>
-                    <option value="Boston Red Sox" selected>Boston Red Sox</option>
+                    <option value="Boston Red Sox">Boston Red Sox</option>
                     <option value="New York Yankees">New York Yankees</option>
                     <option value="Tampa Bay Rays">Tampa Bay Rays</option>
                     <option value="Toronto Blue Jays">Toronto Blue Jays</option>

@@ -75,29 +75,43 @@ function App() {
   const [currPlayers, setCurrPlayers] = useState([])
   const [currTeam, setCurrTeam] = useState("Boston Red Sox");
   const [currDate, setCurrDate] = useState(getTodaysDate());
+  const [isLoading, setIsLoading] = useState(true);
 
   function handleTeamSelect(value) {
     setCurrTeam(value);
   }
 
   function handleDateSelect(value) {
-    console.log(value);
     setCurrDate(value);
   }
 
   useEffect(() => {
     let team = currTeam;
     let date = currDate;
-    fetch(getScheduleUrl(date))
-      .then(response => response.json())
-      .then(result => {
-        let gameId = getGameId(result, team);
-        fetch(getBoxScoreOfGameUrl(gameId))
-          .then(resp => resp.json())
-          .then(res => {
-            setCurrPlayers(getPlayers(res, team));
-          });
-      });
+    setIsLoading(true);
+
+    const fetchBaseballData = () => {
+      fetch(getScheduleUrl(date))
+        .then(response => response.json())
+        .then(result => {
+          let gameId = getGameId(result, team);
+          fetch(getBoxScoreOfGameUrl(gameId))
+            .then(resp => resp.json())
+            .then(res => {
+              setCurrPlayers(getPlayers(res, team));
+            })
+            .finally(() => {
+              setIsLoading(false);
+            })
+        });
+    };
+
+    fetchBaseballData();
+
+    if (date === getTodaysDate()) {
+      const intervalId = setInterval(fetchBaseballData, 30000);
+      return () => clearInterval(intervalId);       
+    }
   }, [currTeam, currDate]);
 
   const currPlayerElements = currPlayers.map(player => {
@@ -114,11 +128,11 @@ function App() {
     <>
       <h1>MLB Performance Tracker</h1>
       <div className="input-container">
-        <TeamSelector handleTeamSelect={handleTeamSelect}/>
+        <TeamSelector handleTeamSelect={handleTeamSelect} currTeam={currTeam}/>
         <DateSelector handleDateSelect={handleDateSelect} currDate={currDate}/>        
       </div>
       {currPlayerElements}
-      {/* {currPlayers.length === 0? <p>The {currTeam} did not play on {currDate}. Please select another team/date.</p> : null} */}
+      {(!isLoading && currPlayers.length === 0)? <p>The {currTeam} have not played on {currDate}. Please select another team/date or check back later.</p> : null}
     </>
   );
 }
