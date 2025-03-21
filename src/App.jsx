@@ -4,19 +4,18 @@ import PlayerCard from './components/PlayerCard';
 import TeamSelector from './components/TeamSelector';
 import DateSelector from './components/DateSelector';
 
-function getPlayers(jsonData, team) {
-  const players = [];
-  const awayTeam = jsonData["teams"]["away"]["team"]["name"];
-  const playersJson = (awayTeam === team)? 
+function getPlayersByPosition(jsonData, team, positionFilter) {
+  let players = [];
+  let awayTeam = jsonData["teams"]["away"]["team"]["name"];
+  let playersJson = (awayTeam === team)? 
       jsonData["teams"]["away"]["players"] : jsonData["teams"]["home"]["players"];
-
   for (let playerId in playersJson) {
-    const player = playersJson[playerId];
-    if (playedInGame(player)) {
+    let player = playersJson[playerId];
+    let playerPosition = player.position.name;
+    if (playedInGame(player) && positionFilter(playerPosition)) {
       players.push(player);
     }
   }
-  
   return players;
 }
 
@@ -85,7 +84,8 @@ function getTodaysDate() {
 }
 
 function App() {
-  const [currPlayers, setCurrPlayers] = useState([])
+  const [currPositionPlayers, setCurrPositionPlayers] = useState([])
+  const [currPitchers, setCurrPitchers] = useState([]);
   const [currTeam, setCurrTeam] = useState("Boston Red Sox");
   const [currDate, setCurrDate] = useState(getTodaysDate());
   const [isLoading, setIsLoading] = useState(true);
@@ -114,7 +114,10 @@ function App() {
           fetch(getBoxScoreOfGameUrl(gameId))
             .then(resp => resp.json())
             .then(res => {
-              setCurrPlayers(getPlayers(res, team));
+              let positionPlayers = getPlayersByPosition(res, team, pos => pos !== "Pitcher");
+              let pitchers = getPlayersByPosition(res, team, pos => pos === "Pitcher");
+              setCurrPositionPlayers(positionPlayers);
+              setCurrPitchers(pitchers);
             })
             .finally(() => {
               setIsLoading(false);
@@ -143,7 +146,7 @@ function App() {
     };
   }, [currTeam, currDate]);
 
-  const currPlayerElements = currPlayers.map(player => {
+  const getPlayerCard = player => {
     const playerId = player.person.id;
     const playerImg = getPlayerImageUrl(player.person.id, 100);
     const playerName = player.person.fullName;
@@ -151,7 +154,9 @@ function App() {
     const playerBattingSummary = player.stats.batting.summary;
     const playerPitchingSummary = player.stats.pitching.summary;
     return <PlayerCard key={playerId} playerId={playerId} playerImg={playerImg} playerName={playerName} playerPosition={playerPosition} playerBattingSummary={playerBattingSummary} playerPitchingSummary={playerPitchingSummary}/>;
-  });
+  }
+  const currPositionPlayerElements = currPositionPlayers.map(getPlayerCard);
+  const currPitcherElements = currPitchers.map(getPlayerCard);
 
   return (
     <>
@@ -160,8 +165,15 @@ function App() {
         <TeamSelector handleTeamSelect={handleTeamSelect} currTeam={currTeam}/>
         <DateSelector handleDateSelect={handleDateSelect} currDate={currDate}/>        
       </div>
-      {currPlayerElements}
-      {(!isLoading && currPlayers.length === 0)? <p>The {currTeam} have not played on {currDate}. Please select another team/date or check back later.</p> : null}
+      <div className="player-card-container">
+        <div className="position-player-container">
+          {currPositionPlayerElements}
+        </div>
+        <div className="pitcher-container">
+          {currPitcherElements}
+        </div>        
+      </div>
+      {(!isLoading && currPositionPlayers.length === 0)? <p>The {currTeam} have not played on {currDate}. Please select another team/date or check back later.</p> : null}
     </>
   );
 }

@@ -12,6 +12,12 @@
   gap: 10px;
 }
 
+.player-card-container {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+}
+
 .player-image:hover {
   transform: scale(1.05);
 }
