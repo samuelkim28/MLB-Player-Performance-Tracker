@@ -48,18 +48,31 @@ function getScheduleUrl(date) {
 
 // Note: a team could play twice in one day
 function getGameId(jsonData, team) {
-  const dates = jsonData.dates;
+  let dates = jsonData.dates;
   let gameId = "000";
 
   for (let date of dates) {
     for (let game of date.games) {
-      const teams = game.teams;
+      let teams = game.teams;
       if (teams.away.team.name === team || teams.home.team.name === team) {
         gameId = game.gamePk;
       }
     }
   }
   return gameId;
+}
+
+function getGameStatus(jsonData, gameId) {
+  let gameStatus;
+  let dates = jsonData.dates;
+  for (let date of dates) {
+    for (let game of date.games) {
+      if (game.gamePk === gameId) {
+        gameStatus = game.status.detailedState;
+      }
+    }
+  }
+  return gameStatus;
 }
 
 function getTodaysDate() {
@@ -88,6 +101,7 @@ function App() {
   useEffect(() => {
     let team = currTeam;
     let date = currDate;
+    let intervalId;
     setIsLoading(true);
 
     const fetchBaseballData = () => {
@@ -95,6 +109,8 @@ function App() {
         .then(response => response.json())
         .then(result => {
           let gameId = getGameId(result, team);
+          let gameStatus = getGameStatus(result, gameId);
+
           fetch(getBoxScoreOfGameUrl(gameId))
             .then(resp => resp.json())
             .then(res => {
@@ -102,16 +118,29 @@ function App() {
             })
             .finally(() => {
               setIsLoading(false);
-            })
+            });
+          
+          if (gameStatus === "In Progress") {
+            if (!intervalId) {
+              intervalId = setInterval(fetchBaseballData, 10000);
+            }
+          } else {
+            if (intervalId) {
+              clearInterval(intervalId);
+              intervalId = null;
+            }
+          }
         });
     };
 
     fetchBaseballData();
 
-    if (date === getTodaysDate()) {
-      const intervalId = setInterval(fetchBaseballData, 30000);
-      return () => clearInterval(intervalId);       
-    }
+    return () => {
+      if (intervalId) {
+          clearInterval(intervalId);
+          intervalId = null;
+      }
+    };
   }, [currTeam, currDate]);
 
   const currPlayerElements = currPlayers.map(player => {
