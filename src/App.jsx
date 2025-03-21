@@ -83,6 +83,47 @@ function getTodaysDate() {
   return today;
 }
 
+function getPerformanceScore(player) {
+  let battingStats = player.stats.batting;
+  let pitchingStats = player.stats.pitching;
+
+  let groundOuts = battingStats.groundOuts ?? 0;
+  let airOuts = battingStats.airOuts ?? 0;
+  let strikeOuts = battingStats.strikeOuts ?? 0;
+  let baseOnBalls = battingStats.baseOnBalls ?? 0;
+  let hits = battingStats.hits ?? 0;
+  let hitByPitch = battingStats.hitByPitch ?? 0;
+  let caughtStealing = battingStats.caughtStealing ?? 0;
+  let stolenBases = battingStats.stolenBases ?? 0;
+  let gidps = battingStats.groundIntoDoublePlay ?? 0;
+  let gitps = battingStats.groundIntoTriplePlay ?? 0;
+  let totalBases = battingStats.totalBases ?? 0;
+  let rbi = battingStats.rbi ?? 0;
+  let sacBunts = battingStats.sacBunts ?? 0;
+  let sacFlies = battingStats.sacFlies ?? 0;
+  let pickoffs = battingStats.pickoffs ?? 0;
+
+  let outs = pitchingStats.outs ?? 0;
+  let earnedRuns = pitchingStats.earnedRuns ?? 0;
+  let hitsAllowed = pitchingStats.hits ?? 0;
+  let walksAllowed = pitchingStats.baseOnBalls ?? 0;
+  let battersStruckOut = pitchingStats.strikeOuts ?? 0;
+  let holds = pitchingStats.holds ?? 0;
+  let saves = pitchingStats.saves ?? 0;
+  let blownSaves = pitchingStats.blownSaves ?? 0;
+
+  let performanceScore = (-1 * groundOuts) + (-1 * airOuts) + (-1 * strikeOuts) + baseOnBalls + hits +
+      (.25 * hitByPitch) + (-1 * caughtStealing) + stolenBases + (-1 * gidps) + (-2 * gitps) + totalBases +
+      rbi + sacBunts + sacFlies + (-1 * pickoffs) + (outs / 3) + (-1 * earnedRuns) + (-.5 * hitsAllowed) +
+      (-.5 * walksAllowed) + (.5 * battersStruckOut) + holds + (2 * saves) + (-2 * blownSaves);
+
+  return performanceScore;
+}
+
+function comparePlayers(player, player2) {
+  return getPerformanceScore(player2) - getPerformanceScore(player);
+}
+
 function App() {
   const [currPositionPlayers, setCurrPositionPlayers] = useState([])
   const [currPitchers, setCurrPitchers] = useState([]);
@@ -116,6 +157,8 @@ function App() {
             .then(res => {
               let positionPlayers = getPlayersByPosition(res, team, pos => pos !== "Pitcher");
               let pitchers = getPlayersByPosition(res, team, pos => pos === "Pitcher");
+              positionPlayers.sort(comparePlayers);
+              pitchers.sort(comparePlayers);
               setCurrPositionPlayers(positionPlayers);
               setCurrPitchers(pitchers);
             })
