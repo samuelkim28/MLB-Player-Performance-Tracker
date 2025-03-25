@@ -39,10 +39,11 @@ function PlayerCard(props) {
     return (
         <>
             <article className="player-card">
+                <span className="player-ranking">{props.ranking}</span>
                 <a href={playerProfileUrl}>
                     <img src={props.playerImg} className="player-image"/>
-                </a>
-                <p className="player-summary">{props.playerName} {isPitcher(props.playerPosition)? props.playerPitchingSummary : props.playerBattingSummary}</p>
+                </a>        
+                <p className="player-summary">{props.playerName}<br/>{isPitcher(props.playerPosition)? props.playerPitchingSummary : props.playerBattingSummary}</p>
             </article>
         </>
     );

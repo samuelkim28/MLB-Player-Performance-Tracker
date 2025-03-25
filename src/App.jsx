@@ -189,14 +189,23 @@ function App() {
     };
   }, [currTeam, currDate]);
 
-  const getPlayerCard = player => {
+  const getPlayerCard = (player, index) => {
     const playerId = player.person.id;
     const playerImg = getPlayerImageUrl(player.person.id, 100);
     const playerName = player.person.fullName;
     const playerPosition = player.position.name;
     const playerBattingSummary = player.stats.batting.summary;
     const playerPitchingSummary = player.stats.pitching.summary;
-    return <PlayerCard key={playerId} playerId={playerId} playerImg={playerImg} playerName={playerName} playerPosition={playerPosition} playerBattingSummary={playerBattingSummary} playerPitchingSummary={playerPitchingSummary}/>;
+    return <PlayerCard 
+              key={playerId} 
+              playerId={playerId} 
+              playerImg={playerImg} 
+              playerName={playerName} 
+              playerPosition={playerPosition} 
+              playerBattingSummary={playerBattingSummary} 
+              playerPitchingSummary={playerPitchingSummary}
+              ranking={index + 1}
+            />;
   }
   const currPositionPlayerElements = currPositionPlayers.map(getPlayerCard);
   const currPitcherElements = currPitchers.map(getPlayerCard);

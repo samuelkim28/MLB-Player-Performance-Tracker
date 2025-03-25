@@ -18,11 +18,19 @@
   gap: 50px;
 }
 
-.player-image:hover {
-  transform: scale(1.05);
+.player-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.player-summary {
-  margin-top: 0;
-  margin-bottom: 30px;
+.player-ranking {
+  width: 2rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.player-image:hover {
+  transform: scale(1.05);
 }
