@@ -15,7 +15,7 @@
 .player-card-container {
   display: flex;
   justify-content: center;
-  gap: 50px;
+  gap: clamp(5px, 4vw, 100px);
 }
 
 .player-card {
@@ -28,9 +28,17 @@
   width: 2rem;
   font-size: 1.5rem;
   font-weight: bold;
-  margin-right: 10px;
+}
+
+.player-image {
+  width: clamp(60px, 8vw, 130px);
+  height: auto;
 }
 
 .player-image:hover {
   transform: scale(1.05);
+}
+
+.player-summary {
+   font-size: clamp(.7rem, 1.30vw, 1.3rem)
 }
