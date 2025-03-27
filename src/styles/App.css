@@ -15,18 +15,19 @@
 .player-card-container {
   display: flex;
   justify-content: center;
-  gap: clamp(5px, 4vw, 100px);
+  gap: clamp(1px, 4vw, 100px);
 }
 
 .player-card {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-bottom: 10px;
 }
 
 .player-ranking {
   width: 2rem;
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 1.75vw, 2rem);
   font-weight: bold;
 }
 
@@ -40,5 +41,5 @@
 }
 
 .player-summary {
-   font-size: clamp(.7rem, 1.30vw, 1.3rem)
+   font-size: clamp(1rem, 1.30vw, 1.3rem)
 }
