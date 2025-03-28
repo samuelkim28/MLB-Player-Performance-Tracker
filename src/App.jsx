@@ -83,6 +83,14 @@ function getTodaysDate() {
   return today;
 }
 
+function formatDate(date) {
+  const dateComponents = date.split("-");
+  const yyyy = dateComponents[0];
+  const mm = dateComponents[1];
+  const dd = dateComponents[2];
+  return mm + '/' + dd + '/' + yyyy;
+}
+
 function getPerformanceScore(player) {
   let battingStats = player.stats.batting;
   let pitchingStats = player.stats.pitching;
@@ -225,7 +233,7 @@ function App() {
           {currPitcherElements}
         </div>        
       </div>
-      {(!isLoading && currPositionPlayers.length === 0)? <p>The {currTeam} have not played on {currDate}. Please select another team/date or check back later.</p> : null}
+      {(!isLoading && currPositionPlayers.length === 0)? <p>The {currTeam} have not played on {formatDate(currDate)}. Please select another team/date or check back later.</p> : null}
     </>
   );
 }
