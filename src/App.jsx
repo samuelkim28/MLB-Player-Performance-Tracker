@@ -4,33 +4,41 @@ import PlayerCard from './components/PlayerCard';
 import TeamSelector from './components/TeamSelector';
 import DateSelector from './components/DateSelector';
 
-function getPlayersByPosition(jsonData, team, positionFilter) {
+function getPlayers(jsonData, team, role) {
   let players = [];
-  let awayTeam = jsonData["teams"]["away"]["team"]["name"];
-  let playersJson = (awayTeam === team)? 
+  let awayTeam = jsonData.teams.away.team.name;
+  let playersJson = (team === awayTeam)? 
       jsonData["teams"]["away"]["players"] : jsonData["teams"]["home"]["players"];
-  for (let playerId in playersJson) {
-    let player = playersJson[playerId];
-    let playerPosition = player.position.name;
-    if (playedInGame(player) && positionFilter(playerPosition)) {
-      players.push(player);
+  if (team === awayTeam) {
+    let awayBatterIds = jsonData.teams.away.batters;
+    let awayPitcherIds = jsonData.teams.away.pitchers;
+    let awayPlayerIds = (role === "batters")? awayBatterIds : awayPitcherIds;
+    for (let playerId of awayPlayerIds) {
+      for (let fullId in playersJson) {
+        let id = playersJson[fullId]["person"]["id"];
+        let player = playersJson[fullId];
+        if ((role === "batters" && playerId === id && !awayPitcherIds.includes(playerId)) ||
+              (role === "pitchers" && playerId === id)) {
+          players.push(player);
+        }
+      }
     }
+  } else {
+    let homeBatterIds = jsonData.teams.home.batters;
+    let homePitcherIds = jsonData.teams.home.pitchers;
+    let homePlayerIds = (role === "batters")? homeBatterIds : homePitcherIds;
+    for (let playerId of homePlayerIds) {
+      for (let fullId in playersJson) {
+        let id = playersJson[fullId]["person"]["id"];
+        let player = playersJson[fullId];
+        if ((role === "batters" && playerId === id && !homePitcherIds.includes(playerId)) ||
+              (role === "pitchers" && playerId === id)) {
+          players.push(player);
+        }
+      }
+    }   
   }
   return players;
-}
-
-function playedInGame(playerJson) {
-  const playerStats = playerJson["stats"];
-  if (isEmpty(playerStats["batting"]) && isEmpty(playerStats["pitching"]) 
-      && isEmpty(playerStats["fielding"])) {
-    return false;
-  } else {
-    return true;
-  }
-}
-
-function isEmpty(obj) {
-  return Object.keys(obj).length === 0;
 }
 
 function getPlayerImageUrl(playerId, size) {
@@ -163,8 +171,8 @@ function App() {
           fetch(getBoxScoreOfGameUrl(gameId))
             .then(resp => resp.json())
             .then(res => {
-              let positionPlayers = getPlayersByPosition(res, team, pos => pos !== "Pitcher");
-              let pitchers = getPlayersByPosition(res, team, pos => pos === "Pitcher");
+              let positionPlayers = getPlayers(res, team, "batters");
+              let pitchers = getPlayers(res, team, "pitchers");
               positionPlayers.sort(comparePlayers);
               pitchers.sort(comparePlayers);
               setCurrPositionPlayers(positionPlayers);
