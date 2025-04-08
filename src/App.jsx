@@ -3,6 +3,7 @@ import './styles/App.css'
 import PlayerCard from './components/PlayerCard';
 import TeamSelector from './components/TeamSelector';
 import DateSelector from './components/DateSelector';
+import GameNumberSelector from './components/GameNumberSelector';
 
 function getPlayers(jsonData, team, role) {
   let players = [];
@@ -53,15 +54,15 @@ function getScheduleUrl(date) {
   return `https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${date}`;
 }
 
-// Note: a team could play twice in one day
-function getGameId(jsonData, team) {
+function getGameId(jsonData, team, gameNumber) {
   let dates = jsonData.dates;
   let gameId = "000";
 
   for (let date of dates) {
     for (let game of date.games) {
       let teams = game.teams;
-      if (teams.away.team.name === team || teams.home.team.name === team) {
+      if ((teams.away.team.name === team && game.gameNumber === gameNumber) || 
+            teams.home.team.name === team && game.gameNumber === gameNumber) {
         gameId = game.gamePk;
       }
     }
@@ -80,6 +81,19 @@ function getGameStatus(jsonData, gameId) {
     }
   }
   return gameStatus;
+}
+
+function getDoubleheaderStatus(jsonData, gameId) {
+  let doubleheaderStatus = false;
+  let dates = jsonData.dates;
+  for (let date of dates) {
+    for (let game of date.games) {
+      if (game.gamePk === gameId) {
+        doubleheaderStatus = (game.doubleHeader == "N")? false : true;
+      }
+    }
+  }
+  return doubleheaderStatus;
 }
 
 function getTodaysDate() {
@@ -145,6 +159,8 @@ function App() {
   const [currPitchers, setCurrPitchers] = useState([]);
   const [currTeam, setCurrTeam] = useState("Boston Red Sox");
   const [currDate, setCurrDate] = useState(getTodaysDate());
+  const [currGameNumber, setCurrGameNumber] = useState(1);
+  const [doubleheaderStatus, setDoubleheaderStatus] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   function handleTeamSelect(value) {
@@ -155,19 +171,33 @@ function App() {
     setCurrDate(value);
   }
 
+  function handleGameNumberSelect(value) {
+    setCurrGameNumber(parseInt(value));
+  }
+
   useEffect(() => {
     let team = currTeam;
     let date = currDate;
     let intervalId;
+
     setIsLoading(true);
 
     const fetchBaseballData = () => {
       fetch(getScheduleUrl(date))
         .then(response => response.json())
         .then(result => {
-          let gameId = getGameId(result, team);
-          let gameStatus = getGameStatus(result, gameId);
+          // Sets doubleheaderStatus so we know if we need to display a button to choose between Game 1 and Game 2
+          // If there is no doubleheader, then the current game number is set to 1
+          let tempGameNumber = currGameNumber;
+          const dhStatus = getDoubleheaderStatus(result, getGameId(result, team, 1));
+          if (dhStatus === false) {
+            tempGameNumber = 1;
+            setCurrGameNumber(1);
+          }
+          setDoubleheaderStatus(dhStatus);
 
+          let gameId = getGameId(result, team, tempGameNumber);
+          let gameStatus = getGameStatus(result, gameId);    
           fetch(getBoxScoreOfGameUrl(gameId))
             .then(resp => resp.json())
             .then(res => {
@@ -203,7 +233,7 @@ function App() {
           intervalId = null;
       }
     };
-  }, [currTeam, currDate]);
+  }, [currTeam, currDate, currGameNumber]);
 
   const getPlayerCard = (player, index) => {
     const playerId = player.person.id;
@@ -231,7 +261,8 @@ function App() {
       <h1>MLB Performance Tracker</h1>
       <div className="input-container">
         <TeamSelector handleTeamSelect={handleTeamSelect} currTeam={currTeam}/>
-        <DateSelector handleDateSelect={handleDateSelect} currDate={currDate}/>        
+        <DateSelector handleDateSelect={handleDateSelect} currDate={currDate}/> 
+        {(doubleheaderStatus)? <GameNumberSelector handleGameNumberSelect={handleGameNumberSelect} currGameNumber={currGameNumber}/> : null}     
       </div>
       <div className="player-card-container">
         <div className="position-player-container">
